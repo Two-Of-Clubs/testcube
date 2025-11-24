@@ -6,46 +6,29 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/11/24 16:38:11 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/11/24 21:41:29 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube.h"
 
 char *map[] = {
-	"000000000000000111111111111000000000000000",
-	"000000000000000000000000000000000000000000",
-	"000000000111111011101110111111100000000000",
-	"000000001111101011010110101111110000000000",
-	"000000001111101111011110111111110000000000",
-	"000000001111101011010110101111110000000000",
-	"000000000111111011101110111111100000000000",
-	"000000000001111111111111111110000000000000",
-	"000000000000011111111111111000000000000000",
-	"000000000000011110000001111000000000000000",
-	"000000000000111100000000111100000000000000",
-	"000000000001111111111111111110000000000000",
-	"000000000001111111111111111110000000000000",
-	"000000000000011111111111111000000000000000",
-	"000000000000000111111111110000000000000000",
-	"000000000000011111111111111000000000000000",
-	"000000000001111111111111111110000000000000",
-	"000000000011110000000000011111000000000000",
-	"000000000111100000000000001111100000000000",
-	"000000001111000000000000000111110000000000",
-	"000000011111111111111111111111111000000000",
-	"000000011111111111111111111111111000000000",
-	"000000000111111111111111111111100000000000",
-	"000000000011111111111111111111000000000000",
-	"000000000001111111111111111110000000000000",
-	"000000000000111111111111111100000000000000",
-	"000000000000011111111111111000000000000000",
-	"000000000000001111111111110000000000000000",
-	"000000000000000111111111100000000000000000",
-	"000000000000000000000000000000000000000000",
-	"000000000000000000111100000000000000000000",
+	"111111111111111111111111111111111111111111", // 42 chars
+	"100000000000000000000000000000000000000001",
+	"101111111110000011111111100000111111111101",
+	"101000000010000010000000100000100000001101",
+	"101011111011111011101110111110111011101101",
+	"101010001000001010100010100010100010101101",
+	"101011101111101011101110111010111011101101",
+	"101000100000001000000000100010100000001101",
+	"101110111011111011111110111011111011101101",
+	"100000000000000000000000000000000000000001",
+	"101111111111111111111111111111111111111101",
+	"100000000000000000000000000000000000000001",
+	"111111111111111111111111111111111111111111",
 	NULL
 };
+
 
 
 size_t	ft_strlen(char *s)
@@ -86,69 +69,78 @@ void	init_mlx(t_game *game)
 	game->img = mlx_new_image(game->mlx, game->win_width, game->win_height);
 	game->addr = mlx_get_data_addr(game->img, &(game->bits_per_pixel), &(game->line_length), &(game->endian));
 }
-void	render_img(t_program_data *data)
+void	render_img(t_game *game, t_player *player)
 {
 	int i = -1, j = -1;
 	int x, y;
 
-	while (++i < data->game->win_height)
+	while (++i < game->win_height)
 	{
-		y = (int)((float)i / data->game->win_height * map_len(map));
+		y = (int)((float)i / game->win_height * map_len(map));
 
-		while (++j < data->game->win_width)
+		while (++j < game->win_width)
 		{
-			x = (int)((float)j / data->game->win_width * ft_strlen(map[y]));
+			x = (int)((float)j / game->win_width * ft_strlen(map[y]));
 
 
-			int px = (float)data->player->x / ft_strlen(map[y]) 
-						* data->game->win_width;
+			int px = (float)player->x / ft_strlen(map[y]) 
+						* game->win_width;
 
-			int py = (float)data->player->y / map_len(map)
-						* data->game->win_height;
+			int py = (float)player->y / map_len(map)
+						* game->win_height;
 
-			int psize = data->game->win_width / ft_strlen(map[0]);
+			int psize = game->win_width / ft_strlen(map[0]);
+			int ksize = game->win_height / map_len(map);
 
-			if (i >= py && i < py + psize && j >= px && j < px + psize)
+			if (i > py && i < py + psize && j -1 > px && j <= px + psize)
 			{
-				*(int *)(data->game->addr + i * data->game->line_length
-					+ j * (data->game->bits_per_pixel / 8)) = 0x00FF00;
+				*(int *)(game->addr + i * game->line_length
+					+ j * (game->bits_per_pixel / 8)) = 0x00FF00;
 			}
 			else if (map[y][x] == '1')
-				*(int *)(data->game->addr + i * data->game->line_length
-					+ j * (data->game->bits_per_pixel / 8)) = 0x0000FF;
+				*(int *)(game->addr + i * game->line_length
+					+ j * (game->bits_per_pixel / 8)) = 0x0000FF;
 
 			else
-				*(int *)(data->game->addr + i * data->game->line_length
-					+ j * (data->game->bits_per_pixel / 8)) = 0x000000;
+				*(int *)(game->addr + i * game->line_length
+					+ j * (game->bits_per_pixel / 8)) = 0x000000;
 
 			
 		}
 		j = -1;
 	}
-	mlx_put_image_to_window(data->game->mlx, data->game->win, data->game->img, 0, 0);
+	mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);
 }
-
 
 int	handle_moves(int keycode,t_program_data *data)
 {
 	printf("key == %d\n", keycode);
+
 	if (keycode == 119)
 	{
+		if (map[(int)(data->player->y - 0.05)][(int)data->player->x] == '1')
+			return 0;
 		data->player->y -= 0.05;
 	}
 	if (keycode == 115)
 	{
+		if (map[(int)(data->player->y + 0.05)][(int)data->player->x] == '1')
+			return 0;
 		data->player->y += 0.05;
 	}
 	if (keycode == 97)
 	{
+		if (map[(int)data->player->y][(int)(data->player->x - 0.05)] == '1')
+			return 0;
 		data->player->x -= 0.05;
 	}
 	if (keycode == 100)
 	{
+		if (map[(int)data->player->y][(int)(data->player->x + 0.05)] == '1')
+			return 0;
 		data->player->x += 0.05;
 	}
-	render_img(data);
+	render_img(data->game, data->player);
 	return 0;
 }
 int	main(int argc, char **argv)
@@ -160,7 +152,7 @@ int	main(int argc, char **argv)
 	prog_data.player->x = 9.00;
 	prog_data.player->y = 9.00;
 	init_mlx(prog_data.game);
-	render_img(&prog_data);
+	render_img(prog_data.game, prog_data.player);
 	mlx_hook((prog_data.game)->win , 2, 1L << 0, handle_moves, &prog_data);
 	mlx_loop((prog_data.game)->mlx);
 	return (0);
