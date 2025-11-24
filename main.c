@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/11/24 21:41:29 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/11/24 22:02:58 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,25 +120,25 @@ int	handle_moves(int keycode,t_program_data *data)
 	{
 		if (map[(int)(data->player->y - 0.05)][(int)data->player->x] == '1')
 			return 0;
-		data->player->y -= 0.05;
+		data->player->y -= data->player->dir_y * 0.05;
 	}
 	if (keycode == 115)
 	{
 		if (map[(int)(data->player->y + 0.05)][(int)data->player->x] == '1')
 			return 0;
-		data->player->y += 0.05;
+		data->player->y += data->player->dir_y * 0.05;
 	}
 	if (keycode == 97)
 	{
 		if (map[(int)data->player->y][(int)(data->player->x - 0.05)] == '1')
 			return 0;
-		data->player->x -= 0.05;
+		data->player->x -= data->player->dir_x * 0.05;
 	}
 	if (keycode == 100)
 	{
 		if (map[(int)data->player->y][(int)(data->player->x + 0.05)] == '1')
 			return 0;
-		data->player->x += 0.05;
+		data->player->x += data->player->dir_x * 0.05;
 	}
 	render_img(data->game, data->player);
 	return 0;
@@ -151,6 +151,8 @@ int	main(int argc, char **argv)
 	prog_data.player = malloc(sizeof(t_player));
 	prog_data.player->x = 9.00;
 	prog_data.player->y = 9.00;
+	prog_data.player->dir_x = -1;
+	prog_data.player->dir_y = 0;
 	init_mlx(prog_data.game);
 	render_img(prog_data.game, prog_data.player);
 	mlx_hook((prog_data.game)->win , 2, 1L << 0, handle_moves, &prog_data);
