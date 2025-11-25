@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "minilibx-linux/mlx.h"
-
+#include <math.h>
 typedef struct s_game
 {
 	void *mlx;
@@ -23,7 +23,6 @@ typedef struct s_player
 {
 	double x;
 	double y;
-	char orientation; // N, S, E, W
 	double dir_x;
 	double dir_y;
 	double plane_x;

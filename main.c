@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/11/24 22:02:58 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/11/25 20:53:22 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,27 @@ int	handle_moves(int keycode,t_program_data *data)
 		if (map[(int)data->player->y][(int)(data->player->x + 0.05)] == '1')
 			return 0;
 		data->player->x += data->player->dir_x * 0.05;
+	}
+	if (keycode == 65363)
+	{
+		double oldDirX = data->player->dir_x;
+
+		data->player->dir_x = data->player->dir_x * cos(9)
+	           	        		- data->player->dir_y * sin(9);
+
+		data->player->dir_y = oldDirX * sin(9)
+                 			   + data->player->dir_y * cos(9);
+
+	}
+	if (keycode == 65361)
+	{
+		double oldDirX = data->player->dir_x;
+
+		data->player->dir_x = data->player->dir_x * cos(-9)
+	           	        		- data->player->dir_y * sin(-9);
+
+		data->player->dir_y = oldDirX * sin(-9)
+                 			   + data->player->dir_y * cos(-9);
 	}
 	render_img(data->game, data->player);
 	return 0;
