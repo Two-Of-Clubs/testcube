@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/11/25 20:53:22 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/11/27 18:19:11 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,11 +83,9 @@ void	render_img(t_game *game, t_player *player)
 			x = (int)((float)j / game->win_width * ft_strlen(map[y]));
 
 
-			int px = (float)player->x / ft_strlen(map[y]) 
-						* game->win_width;
+			int px = (float)player->x / ft_strlen(map[y]) * game->win_width;
 
-			int py = (float)player->y / map_len(map)
-						* game->win_height;
+			int py = (float)player->y / map_len(map) * game->win_height;
 
 			int psize = game->win_width / ft_strlen(map[0]);
 			int ksize = game->win_height / map_len(map);
@@ -109,57 +107,63 @@ void	render_img(t_game *game, t_player *player)
 		}
 		j = -1;
 	}
-	mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);
+	mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);     // x = 3    y = 6 .5  *32 
 }
 
 int	handle_moves(int keycode,t_program_data *data)
 {
+	double	new_x, new_y;
 	printf("key == %d\n", keycode);
 
-	if (keycode == 119)
+	if (keycode == 119)//w
 	{
-		if (map[(int)(data->player->y - 0.05)][(int)data->player->x] == '1')
-			return 0;
-		data->player->y -= data->player->dir_y * 0.05;
+		new_x = data->player->x + data->player->dir_x * 0.05;
+		new_y = data->player->y + data->player->dir_y * 0.05;
+
+		if (map[(int)new_y][(int)new_x] == '1')
+			return 1;
+		data->player->x = new_x;
+		data->player->y = new_y;
 	}
-	if (keycode == 115)
+	if (keycode == 115)//s
 	{
-		if (map[(int)(data->player->y + 0.05)][(int)data->player->x] == '1')
-			return 0;
-		data->player->y += data->player->dir_y * 0.05;
+		new_x = data->player->x - data->player->dir_x * 0.05;
+		new_y = data->player->y - data->player->dir_y * 0.05;
+
+		if (map[(int)new_y][(int)new_x] == '1')
+			return 1;
+		data->player->x = new_x;
+		data->player->y = new_y;
 	}
-	if (keycode == 97)
+	if (keycode == 97)//a
 	{
-		if (map[(int)data->player->y][(int)(data->player->x - 0.05)] == '1')
-			return 0;
-		data->player->x -= data->player->dir_x * 0.05;
+		new_x = data->player->x - data->player->dir_y * 0.05;
+		new_y = data->player->y + data->player->dir_x * 0.05;
+		
+		if (map[(int)new_y][(int)new_x] == '1')
+			return 1;
+		data->player->x = new_x;
+		data->player->y = new_y;
 	}
-	if (keycode == 100)
+	if (keycode == 100)//d
 	{
-		if (map[(int)data->player->y][(int)(data->player->x + 0.05)] == '1')
-			return 0;
-		data->player->x += data->player->dir_x * 0.05;
+		new_x = data->player->x + data->player->dir_y * 0.05;
+		new_y = data->player->y - data->player->dir_x * 0.05;
+		
+		if (map[(int)new_y][(int)new_x] == '1')
+			return 1;
+		data->player->x = new_x;
+		data->player->y = new_y;
 	}
 	if (keycode == 65363)
 	{
-		double oldDirX = data->player->dir_x;
-
-		data->player->dir_x = data->player->dir_x * cos(9)
-	           	        		- data->player->dir_y * sin(9);
-
-		data->player->dir_y = oldDirX * sin(9)
-                 			   + data->player->dir_y * cos(9);
-
+		data->player->dir_x = data->player->dir_x * cos(0.05) - data->player->dir_y * sin(0.05);
+		data->player->dir_y = data->player->dir_x * sin(0.05) + data->player->dir_y * cos(0.05);
 	}
 	if (keycode == 65361)
 	{
-		double oldDirX = data->player->dir_x;
-
-		data->player->dir_x = data->player->dir_x * cos(-9)
-	           	        		- data->player->dir_y * sin(-9);
-
-		data->player->dir_y = oldDirX * sin(-9)
-                 			   + data->player->dir_y * cos(-9);
+		data->player->dir_x = data->player->dir_x * cos(-0.05) - data->player->dir_y * sin(-0.05);
+		data->player->dir_y = data->player->dir_x * sin(-0.05) + data->player->dir_y * cos(-0.05); 
 	}
 	render_img(data->game, data->player);
 	return 0;
