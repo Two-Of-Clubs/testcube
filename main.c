@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/11/27 18:19:11 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/11/28 12:43:05 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,13 +157,15 @@ int	handle_moves(int keycode,t_program_data *data)
 	}
 	if (keycode == 65363)
 	{
-		data->player->dir_x = data->player->dir_x * cos(0.05) - data->player->dir_y * sin(0.05);
-		data->player->dir_y = data->player->dir_x * sin(0.05) + data->player->dir_y * cos(0.05);
+		data->player->rot_angle += 0.05;
+		data->player->dir_x = cos(data->player->rot_angle);
+		data->player->dir_y = sin(data->player->rot_angle);
 	}
 	if (keycode == 65361)
 	{
-		data->player->dir_x = data->player->dir_x * cos(-0.05) - data->player->dir_y * sin(-0.05);
-		data->player->dir_y = data->player->dir_x * sin(-0.05) + data->player->dir_y * cos(-0.05); 
+		data->player->rot_angle -= 0.05;
+		data->player->dir_x = cos(data->player->rot_angle);
+		data->player->dir_y = sin(data->player->rot_angle);
 	}
 	render_img(data->game, data->player);
 	return 0;
@@ -176,8 +178,9 @@ int	main(int argc, char **argv)
 	prog_data.player = malloc(sizeof(t_player));
 	prog_data.player->x = 9.00;
 	prog_data.player->y = 9.00;
-	prog_data.player->dir_x = -1;
-	prog_data.player->dir_y = 0;
+	prog_data.player->rot_angle = 1.57;
+	prog_data.player->dir_x = cos(prog_data.player->rot_angle);
+	prog_data.player->dir_y = sin(prog_data.player->rot_angle);
 	init_mlx(prog_data.game);
 	render_img(prog_data.game, prog_data.player);
 	mlx_hook((prog_data.game)->win , 2, 1L << 0, handle_moves, &prog_data);
