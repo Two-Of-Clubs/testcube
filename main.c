@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/11/28 12:43:05 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/11/30 04:09:13 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ void	render_img(t_game *game, t_player *player)
 		}
 		j = -1;
 	}
-	mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);     // x = 3    y = 6 .5  *32 
+	mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);
 }
 
 int	handle_moves(int keycode,t_program_data *data)
@@ -120,53 +120,65 @@ int	handle_moves(int keycode,t_program_data *data)
 		new_x = data->player->x + data->player->dir_x * 0.05;
 		new_y = data->player->y + data->player->dir_y * 0.05;
 
-		if (map[(int)new_y][(int)new_x] == '1')
-			return 1;
-		data->player->x = new_x;
-		data->player->y = new_y;
+		if (map[(int)new_y][(int)new_x] == '0')
+		{
+			data->player->x = new_x;
+			data->player->y = new_y;
+		}
 	}
-	if (keycode == 115)//s
+	else if (keycode == 115)//s
 	{
 		new_x = data->player->x - data->player->dir_x * 0.05;
 		new_y = data->player->y - data->player->dir_y * 0.05;
 
-		if (map[(int)new_y][(int)new_x] == '1')
-			return 1;
-		data->player->x = new_x;
-		data->player->y = new_y;
+		if (map[(int)new_y][(int)new_x] == '0')
+		{
+			data->player->x = new_x;
+			data->player->y = new_y;
+		}
 	}
-	if (keycode == 97)//a
+	else if (keycode == 97)//a
 	{
 		new_x = data->player->x - data->player->dir_y * 0.05;
 		new_y = data->player->y + data->player->dir_x * 0.05;
 		
-		if (map[(int)new_y][(int)new_x] == '1')
-			return 1;
-		data->player->x = new_x;
-		data->player->y = new_y;
+		if (map[(int)new_y][(int)new_x] == '0')
+		{
+			data->player->x = new_x;
+			data->player->y = new_y;
+		}
 	}
-	if (keycode == 100)//d
+	else if (keycode == 100)//d
 	{
 		new_x = data->player->x + data->player->dir_y * 0.05;
 		new_y = data->player->y - data->player->dir_x * 0.05;
 		
-		if (map[(int)new_y][(int)new_x] == '1')
-			return 1;
-		data->player->x = new_x;
-		data->player->y = new_y;
+		if (map[(int)new_y][(int)new_x] == '0')
+		{
+			data->player->x = new_x;
+			data->player->y = new_y;
+		}
 	}
-	if (keycode == 65363)
+	else if (keycode == 65363)
 	{
-		data->player->rot_angle += 0.05;
-		data->player->dir_x = cos(data->player->rot_angle);
-		data->player->dir_y = sin(data->player->rot_angle);
+		data->player->dir_x = data->player->dir_x * cos(rot) - data->player->dir_y * sin(rot);
+		data->player->dir_y = data->player->dir_x * sin(rot) + data->player->dir_y * cos(rot);
+		double len = sqrt(data->player->dir_x * data->player->dir_x + data->player->dir_y * data->player->dir_y);
+
+		data->player->dir_x /= len;
+		data->player->dir_y /= len;
 	}
-	if (keycode == 65361)
+	else if (keycode == 65361)
 	{
-		data->player->rot_angle -= 0.05;
-		data->player->dir_x = cos(data->player->rot_angle);
-		data->player->dir_y = sin(data->player->rot_angle);
+		data->player->dir_x = data->player->dir_x * cos(rot) - data->player->dir_y * sin(rot);
+		data->player->dir_y = -data->player->dir_x * sin(rot) + data->player->dir_y * cos(rot);
+		double len = sqrt(data->player->dir_x * data->player->dir_x +
+                  data->player->dir_y * data->player->dir_y);
+
+		data->player->dir_x /= len;
+		data->player->dir_y /= len;
 	}
+	printf("dirx = %f || diry = %f \n",data->player->dir_x,data->player->dir_y);
 	render_img(data->game, data->player);
 	return 0;
 }
@@ -178,9 +190,8 @@ int	main(int argc, char **argv)
 	prog_data.player = malloc(sizeof(t_player));
 	prog_data.player->x = 9.00;
 	prog_data.player->y = 9.00;
-	prog_data.player->rot_angle = 1.57;
-	prog_data.player->dir_x = cos(prog_data.player->rot_angle);
-	prog_data.player->dir_y = sin(prog_data.player->rot_angle);
+	prog_data.player->dir_x = 0;
+	prog_data.player->dir_y = 1;
 	init_mlx(prog_data.game);
 	render_img(prog_data.game, prog_data.player);
 	mlx_hook((prog_data.game)->win , 2, 1L << 0, handle_moves, &prog_data);

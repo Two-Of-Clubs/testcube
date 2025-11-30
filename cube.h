@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "minilibx-linux/mlx.h"
 #include <math.h>
+
+#define rot 0.2
 typedef struct s_game
 {
 	void *mlx;
@@ -23,7 +25,6 @@ typedef struct s_player
 {
 	double x;
 	double y;
-	double rot_angle;
 	double dir_x;
 	double dir_y;
 	double plane_x;
