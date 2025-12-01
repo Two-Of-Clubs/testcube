@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/11/30 04:09:13 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/12/01 23:25:28 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,8 +161,9 @@ int	handle_moves(int keycode,t_program_data *data)
 	}
 	else if (keycode == 65363)
 	{
+		double old_x = data->player->dir_x;
 		data->player->dir_x = data->player->dir_x * cos(rot) - data->player->dir_y * sin(rot);
-		data->player->dir_y = data->player->dir_x * sin(rot) + data->player->dir_y * cos(rot);
+		data->player->dir_y = old_x * sin(rot) + data->player->dir_y * cos(rot);
 		double len = sqrt(data->player->dir_x * data->player->dir_x + data->player->dir_y * data->player->dir_y);
 
 		data->player->dir_x /= len;
@@ -172,8 +173,7 @@ int	handle_moves(int keycode,t_program_data *data)
 	{
 		data->player->dir_x = data->player->dir_x * cos(rot) - data->player->dir_y * sin(rot);
 		data->player->dir_y = -data->player->dir_x * sin(rot) + data->player->dir_y * cos(rot);
-		double len = sqrt(data->player->dir_x * data->player->dir_x +
-                  data->player->dir_y * data->player->dir_y);
+		double len = sqrt(data->player->dir_x * data->player->dir_x + data->player->dir_y * data->player->dir_y);
 
 		data->player->dir_x /= len;
 		data->player->dir_y /= len;
@@ -182,6 +182,7 @@ int	handle_moves(int keycode,t_program_data *data)
 	render_img(data->game, data->player);
 	return 0;
 }
+
 int	main(int argc, char **argv)
 {
 	t_program_data prog_data;
