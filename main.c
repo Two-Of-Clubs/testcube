@@ -6,14 +6,14 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/12/01 23:25:28 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/12/04 00:03:45 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube.h"
 
 char *map[] = {
-	"111111111111111111111111111111111111111111", // 42 chars
+	"111111111111111111111111111111111111111111",
 	"100000000000000000000000000000000000000001",
 	"101111111110000011111111100000111111111101",
 	"101000000010000010000000100000100000001101",
@@ -28,8 +28,6 @@ char *map[] = {
 	"111111111111111111111111111111111111111111",
 	NULL
 };
-
-
 
 size_t	ft_strlen(char *s)
 {
@@ -61,126 +59,40 @@ size_t	map_len(char **map)
 
 void	init_mlx(t_game *game)
 {
-	game->win_height = 800;
-	game->win_width = 800;
+	game->win_height = 500;
+	game->win_width = 500;
 	
 	game->mlx = mlx_init();
 	game->win = mlx_new_window(game->mlx, game->win_width, game->win_height, "cub3d");
 	game->img = mlx_new_image(game->mlx, game->win_width, game->win_height);
 	game->addr = mlx_get_data_addr(game->img, &(game->bits_per_pixel), &(game->line_length), &(game->endian));
 }
-void	render_img(t_game *game, t_player *player)
+void render_img(t_game *game, t_player *player)
 {
-	int i = -1, j = -1;
-	int x, y;
-
-	while (++i < game->win_height)
-	{
-		y = (int)((float)i / game->win_height * map_len(map));
-
-		while (++j < game->win_width)
-		{
-			x = (int)((float)j / game->win_width * ft_strlen(map[y]));
-
-
-			int px = (float)player->x / ft_strlen(map[y]) * game->win_width;
-
-			int py = (float)player->y / map_len(map) * game->win_height;
-
-			int psize = game->win_width / ft_strlen(map[0]);
-			int ksize = game->win_height / map_len(map);
-
-			if (i > py && i < py + psize && j -1 > px && j <= px + psize)
-			{
-				*(int *)(game->addr + i * game->line_length
-					+ j * (game->bits_per_pixel / 8)) = 0x00FF00;
-			}
-			else if (map[y][x] == '1')
-				*(int *)(game->addr + i * game->line_length
-					+ j * (game->bits_per_pixel / 8)) = 0x0000FF;
-
-			else
-				*(int *)(game->addr + i * game->line_length
-					+ j * (game->bits_per_pixel / 8)) = 0x000000;
-
-			
-		}
-		j = -1;
-	}
-	mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);
-}
-
-int	handle_moves(int keycode,t_program_data *data)
-{
-	double	new_x, new_y;
-	printf("key == %d\n", keycode);
-
-	if (keycode == 119)//w
-	{
-		new_x = data->player->x + data->player->dir_x * 0.05;
-		new_y = data->player->y + data->player->dir_y * 0.05;
-
-		if (map[(int)new_y][(int)new_x] == '0')
-		{
-			data->player->x = new_x;
-			data->player->y = new_y;
-		}
-	}
-	else if (keycode == 115)//s
-	{
-		new_x = data->player->x - data->player->dir_x * 0.05;
-		new_y = data->player->y - data->player->dir_y * 0.05;
-
-		if (map[(int)new_y][(int)new_x] == '0')
-		{
-			data->player->x = new_x;
-			data->player->y = new_y;
-		}
-	}
-	else if (keycode == 97)//a
-	{
-		new_x = data->player->x - data->player->dir_y * 0.05;
-		new_y = data->player->y + data->player->dir_x * 0.05;
-		
-		if (map[(int)new_y][(int)new_x] == '0')
-		{
-			data->player->x = new_x;
-			data->player->y = new_y;
-		}
-	}
-	else if (keycode == 100)//d
-	{
-		new_x = data->player->x + data->player->dir_y * 0.05;
-		new_y = data->player->y - data->player->dir_x * 0.05;
-		
-		if (map[(int)new_y][(int)new_x] == '0')
-		{
-			data->player->x = new_x;
-			data->player->y = new_y;
-		}
-	}
-	else if (keycode == 65363)
-	{
-		double old_x = data->player->dir_x;
-		data->player->dir_x = data->player->dir_x * cos(rot) - data->player->dir_y * sin(rot);
-		data->player->dir_y = old_x * sin(rot) + data->player->dir_y * cos(rot);
-		double len = sqrt(data->player->dir_x * data->player->dir_x + data->player->dir_y * data->player->dir_y);
-
-		data->player->dir_x /= len;
-		data->player->dir_y /= len;
-	}
-	else if (keycode == 65361)
-	{
-		data->player->dir_x = data->player->dir_x * cos(rot) - data->player->dir_y * sin(rot);
-		data->player->dir_y = -data->player->dir_x * sin(rot) + data->player->dir_y * cos(rot);
-		double len = sqrt(data->player->dir_x * data->player->dir_x + data->player->dir_y * data->player->dir_y);
-
-		data->player->dir_x /= len;
-		data->player->dir_y /= len;
-	}
-	printf("dirx = %f || diry = %f \n",data->player->dir_x,data->player->dir_y);
-	render_img(data->game, data->player);
-	return 0;
+    int map_w = ft_strlen(map[0]);
+    int map_h = map_len(map);
+    float cell_w = (float)game->win_width / map_w;
+    float cell_h = (float)game->win_height / map_h;
+    int px = player->x * cell_w;
+    int py = player->y * cell_h;
+    for (int i = 0; i < game->win_height; i++)
+    {
+        int y = i / cell_h;
+        for (int j = 0; j < game->win_width; j++)
+        {
+            int x = j / cell_w;
+            int color;
+            if (map[y][x] == '1')
+                color = 0x0000FF;
+            else
+                color = 0x000000;
+            if (i == py && j == px)
+                color = 0x00FF00;
+            *(int *)(game->addr + i * game->line_length
+                + j * (game->bits_per_pixel / 8)) = color;
+        }
+    }
+    mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);
 }
 
 int	main(int argc, char **argv)

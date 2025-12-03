@@ -8,6 +8,9 @@
 #include <math.h>
 
 #define rot 0.2
+
+extern char *map[];
+
 typedef struct s_game
 {
 	void *mlx;
@@ -37,5 +40,7 @@ typedef struct s_program_data
 	t_player *player;
 } t_program_data;
 
+int	handle_moves(int keycode,t_program_data *data);
+void	render_img(t_game *game, t_player *player);
 
 #endif
