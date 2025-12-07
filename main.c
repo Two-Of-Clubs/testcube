@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/12/04 00:03:45 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/12/07 17:39:39 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,22 @@ void render_img(t_game *game, t_player *player)
     mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);
 }
 
+
+void cast_ray(t_program_data *data)
+{
+	int i;
+	double x_raydir;
+	double y_raydir;
+	double ray_ratio;
+	i = 0;
+	while (i < data->game->win_width)
+	{
+		ray_ratio = 2 * (double)i / data->game->win_width - 1;
+		x_raydir = data->player->dir_x + data->player->plane_x * ray_ratio;
+		y_raydir = data->player->dir_y + data->player->plane_y * ray_ratio;
+	}
+}
+
 int	main(int argc, char **argv)
 {
 	t_program_data prog_data;
@@ -105,6 +121,8 @@ int	main(int argc, char **argv)
 	prog_data.player->y = 9.00;
 	prog_data.player->dir_x = 0;
 	prog_data.player->dir_y = 1;
+	prog_data.player->plane_x = prog_data.player->dir_y * 0.66;
+	prog_data.player->plane_y = -prog_data.player->dir_x * 0.66;
 	init_mlx(prog_data.game);
 	render_img(prog_data.game, prog_data.player);
 	mlx_hook((prog_data.game)->win , 2, 1L << 0, handle_moves, &prog_data);
