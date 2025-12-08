@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/12/07 17:39:39 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/12/08 15:55:19 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,9 @@ void cast_ray(t_program_data *data)
 	int i;
 	double x_raydir;
 	double y_raydir;
+	double delta_x;
+	double delta_y;
+	int step_x, step_y;
 	double ray_ratio;
 	i = 0;
 	while (i < data->game->win_width)
@@ -108,6 +111,16 @@ void cast_ray(t_program_data *data)
 		ray_ratio = 2 * (double)i / data->game->win_width - 1;
 		x_raydir = data->player->dir_x + data->player->plane_x * ray_ratio;
 		y_raydir = data->player->dir_y + data->player->plane_y * ray_ratio;
+		delta_x = fabs(1.0 / x_raydir);
+		delta_y = fabs(1.0 / y_raydir);
+		if (x_raydir < 0)
+			step_x = -1;
+		else
+			step_x = 1;
+		if (y_raydir < 0)
+			step_y = -1;
+		else
+			step_y = 1;
 	}
 }
 
