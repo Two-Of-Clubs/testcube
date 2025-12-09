@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/12/08 15:55:19 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/12/09 14:47:26 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,32 +95,67 @@ void render_img(t_game *game, t_player *player)
     mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);
 }
 
-
-void cast_ray(t_program_data *data)
+void	castray_helper(t_dda *dda, t_program_data *data)
 {
+	dda->delta_x = fabs(1.0 / dda->x_raydir);
+	dda->delta_y = fabs(1.0 / dda->y_raydir);
+	if (dda->x_raydir < 0)
+	{
+		dda->step_x = -1;
+		dda->x_axis_dist = (data->player->x - dda->x_map) * dda->delta_x;
+	}
+	else
+	{
+		dda->step_x = 1;
+		dda->x_axis_dist = (dda->x_map + 1.0 - data->player->x) * dda->delta_x;
+	}
+	if (dda->y_raydir < 0)
+	{
+		dda->step_y = -1;
+		dda->y_axis_dist = (data->player->y - dda->y_map) * dda->delta_y;
+	}
+	else
+	{
+		dda->step_y = 1;
+		dda->y_axis_dist = (dda->y_map + 1.0 - data->player->y) * dda->delta_y;
+	}
+}
+void	dda_loop(t_dda *dda)
+{
+	int wall;
+	
+	wall = 0;
+	while (!wall)
+	{
+		if (dda->x_axis_dist < dda->y_axis_dist)
+		{
+			dda->x_axis_dist += dda->delta_x;
+			dda->x_map += dda->step_x;
+			dda->side = 0;
+		}
+		else
+		{
+			dda->y_axis_dist += dda->delta_y;
+			dda->y_map += dda->step_y;
+			dda->side = 1;
+		}
+		if (map[dda->y_map][dda->x_map] == '1')
+			wall = 1;
+	}
+	if ()
+}
+void castray(t_program_data *data)
+{
+	t_dda dda;
 	int i;
-	double x_raydir;
-	double y_raydir;
-	double delta_x;
-	double delta_y;
-	int step_x, step_y;
-	double ray_ratio;
+	
 	i = 0;
 	while (i < data->game->win_width)
 	{
-		ray_ratio = 2 * (double)i / data->game->win_width - 1;
-		x_raydir = data->player->dir_x + data->player->plane_x * ray_ratio;
-		y_raydir = data->player->dir_y + data->player->plane_y * ray_ratio;
-		delta_x = fabs(1.0 / x_raydir);
-		delta_y = fabs(1.0 / y_raydir);
-		if (x_raydir < 0)
-			step_x = -1;
-		else
-			step_x = 1;
-		if (y_raydir < 0)
-			step_y = -1;
-		else
-			step_y = 1;
+		dda.ray_ratio = 2 * (double)i / data->game->win_width - 1;
+		dda.x_raydir = data->player->dir_x + data->player->plane_x * dda.ray_ratio;
+		dda.y_raydir = data->player->dir_y + data->player->plane_y * dda.ray_ratio;
+		
 	}
 }
 
