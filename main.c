@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/12/09 14:47:26 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/12/10 19:42:43 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,10 @@ void	dda_loop(t_dda *dda)
 		if (map[dda->y_map][dda->x_map] == '1')
 			wall = 1;
 	}
-	if ()
+	if (wall == 0)
+		dda->perp_wall_dist = dda->x_axis_dist - dda->delta_x;
+	else
+		dda->perp_wall_dist = dda->y_axis_dist - dda->delta_y;
 }
 void castray(t_program_data *data)
 {
@@ -155,7 +158,11 @@ void castray(t_program_data *data)
 		dda.ray_ratio = 2 * (double)i / data->game->win_width - 1;
 		dda.x_raydir = data->player->dir_x + data->player->plane_x * dda.ray_ratio;
 		dda.y_raydir = data->player->dir_y + data->player->plane_y * dda.ray_ratio;
-		
+		castray_helper(&dda, data);
+		dda_loop(&dda);
+		int linehight = (int)(data->game->win_height / dda.perp_wall_dist);
+		int start = -linehight / 2 + data->game->win_height / 2;
+		int end = linehight / 2 + data->game->win_height / 2;
 	}
 }
 
