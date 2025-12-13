@@ -94,6 +94,7 @@ int	handle_moves(int keycode,t_program_data *data)
 	else if (keycode == 65363 || keycode == 65361)
 		handle_rotation(keycode, data);
 	printf("dirx = %f || diry = %f \n",data->player->dir_x,data->player->dir_y);
-	render_img(data->game, data->player);
+	castray(data);
+	// render_img(data->game, data->player);
 	return 0;
 }

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "minilibx-linux/mlx.h"
 #include <math.h>
-
+#include <string.h>
 #define rot 0.2
 
 extern char *map[];
@@ -48,7 +48,7 @@ typedef struct s_dda
 	int	step_y;
 	double ray_ratio;
 	int side;
-	double perp_wall_dist
+	double perp_wall_dist;
 }	t_dda;
 
 typedef struct s_program_data
@@ -59,5 +59,6 @@ typedef struct s_program_data
 
 int	handle_moves(int keycode,t_program_data *data);
 void	render_img(t_game *game, t_player *player);
+void castray(t_program_data *data);
 
 #endif

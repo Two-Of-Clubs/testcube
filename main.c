@@ -6,7 +6,7 @@
 /*   By: abbenmou <abbenmou@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/13 16:09:56 by abbenmou          #+#    #+#             */
-/*   Updated: 2025/12/10 19:42:43 by abbenmou         ###   ########.fr       */
+/*   Updated: 2025/12/13 18:26:48 by abbenmou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,8 @@ size_t	map_len(char **map)
 
 void	init_mlx(t_game *game)
 {
-	game->win_height = 500;
-	game->win_width = 500;
+	game->win_height = 800;
+	game->win_width = 800;
 	
 	game->mlx = mlx_init();
 	game->win = mlx_new_window(game->mlx, game->win_width, game->win_height, "cub3d");
@@ -97,33 +97,44 @@ void render_img(t_game *game, t_player *player)
 
 void	castray_helper(t_dda *dda, t_program_data *data)
 {
-	dda->delta_x = fabs(1.0 / dda->x_raydir);
-	dda->delta_y = fabs(1.0 / dda->y_raydir);
+	if (dda->x_raydir == 0)
+		dda->delta_x = 1e30;
+	else
+		dda->delta_x = fabs(1.0 / dda->x_raydir);
+	if (dda->y_raydir == 0)
+		dda->delta_y = 1e30;
+	else
+		dda->delta_y = fabs(1.0 / dda->y_raydir);
 	if (dda->x_raydir < 0)
 	{
 		dda->step_x = -1;
-		dda->x_axis_dist = (data->player->x - dda->x_map) * dda->delta_x;
+		dda->x_axis_dist = (data->player->x - dda->x_map)
+			* dda->delta_x;
 	}
 	else
 	{
 		dda->step_x = 1;
-		dda->x_axis_dist = (dda->x_map + 1.0 - data->player->x) * dda->delta_x;
+		dda->x_axis_dist = (dda->x_map + 1.0 - data->player->x)
+			* dda->delta_x;
 	}
 	if (dda->y_raydir < 0)
 	{
 		dda->step_y = -1;
-		dda->y_axis_dist = (data->player->y - dda->y_map) * dda->delta_y;
+		dda->y_axis_dist = (data->player->y - dda->y_map)
+			* dda->delta_y;
 	}
 	else
 	{
 		dda->step_y = 1;
-		dda->y_axis_dist = (dda->y_map + 1.0 - data->player->y) * dda->delta_y;
+		dda->y_axis_dist = (dda->y_map + 1.0 - data->player->y)
+			* dda->delta_y;
 	}
 }
-void	dda_loop(t_dda *dda)
+
+void	dda_loop(t_dda *dda, t_program_data *data)
 {
 	int wall;
-	
+
 	wall = 0;
 	while (!wall)
 	{
@@ -139,10 +150,15 @@ void	dda_loop(t_dda *dda)
 			dda->y_map += dda->step_y;
 			dda->side = 1;
 		}
+		if (dda->x_map < 0 || dda->y_map < 0
+			|| dda->y_map >= map_len(map)
+			|| dda->x_map >= ft_strlen(map[0]))
+			break;
+
 		if (map[dda->y_map][dda->x_map] == '1')
 			wall = 1;
 	}
-	if (wall == 0)
+	if (dda->side == 0)
 		dda->perp_wall_dist = dda->x_axis_dist - dda->delta_x;
 	else
 		dda->perp_wall_dist = dda->y_axis_dist - dda->delta_y;
@@ -150,20 +166,35 @@ void	dda_loop(t_dda *dda)
 void castray(t_program_data *data)
 {
 	t_dda dda;
-	int i;
+	int i, k = 0;
 	
 	i = 0;
+	bzero(data->game->addr,data->game->line_length * data->game->win_height);
 	while (i < data->game->win_width)
 	{
-		dda.ray_ratio = 2 * (double)i / data->game->win_width - 1;
+		dda.ray_ratio = 2 * i / (double)data->game->win_width - 1;
 		dda.x_raydir = data->player->dir_x + data->player->plane_x * dda.ray_ratio;
 		dda.y_raydir = data->player->dir_y + data->player->plane_y * dda.ray_ratio;
+		dda.x_map = (int)data->player->x;
+		dda.y_map = (int)data->player->y;
 		castray_helper(&dda, data);
-		dda_loop(&dda);
+		dda_loop(&dda, data);
+		if (dda.perp_wall_dist < 0.0001)
+			dda.perp_wall_dist = 0.0001;
 		int linehight = (int)(data->game->win_height / dda.perp_wall_dist);
 		int start = -linehight / 2 + data->game->win_height / 2;
 		int end = linehight / 2 + data->game->win_height / 2;
+		k = 0;
+		while (k < data->game->win_height)
+		{
+			if (k >= start && k <= end)
+			*(int *)(data->game->addr + k * data->game->line_length
+                + i * (data->game->bits_per_pixel / 8)) = 0x00FF00;
+			k++;
+		}
+		i++;
 	}
+	mlx_put_image_to_window(data->game->mlx, data->game->win, data->game->img, 0, 0);
 }
 
 int	main(int argc, char **argv)
@@ -179,7 +210,8 @@ int	main(int argc, char **argv)
 	prog_data.player->plane_x = prog_data.player->dir_y * 0.66;
 	prog_data.player->plane_y = -prog_data.player->dir_x * 0.66;
 	init_mlx(prog_data.game);
-	render_img(prog_data.game, prog_data.player);
+	// render_img(prog_data.game, prog_data.player);
+	castray(&prog_data);
 	mlx_hook((prog_data.game)->win , 2, 1L << 0, handle_moves, &prog_data);
 	mlx_loop((prog_data.game)->mlx);
 	return (0);
